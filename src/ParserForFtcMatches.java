@@ -27,8 +27,8 @@ public class ParserForFtcMatches {
         season = Format.Season.s1617VELV;
 
         // default input is matches.txt file format
-        inputDataFormat = Format.Data.RESULTS_DETAILS_ALL;
-        inputFileFormat = Format.File.TXT;
+        inputDataFormat = Format.Data.RESULTS_ALL;
+        inputFileFormat = Format.File.MATCHESTXT;
         String inputFileName = "";
 
         // default output is MatchResultsDetails html file
@@ -83,7 +83,7 @@ public class ParserForFtcMatches {
                     break;
 
                 case "-iA":
-                    inputDataFormat = Format.Data.RESULTS_DETAILS_ALL;
+                    inputDataFormat = Format.Data.RESULTS_ALL;
                     clptr++;
                     break;
 
@@ -92,7 +92,17 @@ public class ParserForFtcMatches {
                     clptr++;
                     break;
                 case "-iT":
-                    inputFileFormat = Format.File.TXT;
+                    inputFileFormat = Format.File.MATCHESTXT;
+                    clptr++;
+                    break;
+                case "-iTR":
+                    inputFileFormat = Format.File.RESULTSTXT;
+                    inputDataFormat = Format.Data.RESULTS;
+                    clptr++;
+                    break;
+                case "-iTD":
+                    inputFileFormat = Format.File.DETAILSTXT;
+                    inputDataFormat = Format.Data.RESULTS_DETAILS;
                     clptr++;
                     break;
 
@@ -170,6 +180,9 @@ public class ParserForFtcMatches {
         if (outputDataFormat == Format.Data.RESULTS_DETAILS) {
             bw.write(MatchResultDetails.header(outputFileFormat, tournamentName)+"\n");
         }
+        if (outputDataFormat == Format.Data.RESULTS) {
+            bw.write(MatchResult.header(outputFileFormat, tournamentName)+"\n");
+        }
         if (outputDataFormat == Format.Data.STATS_DETAILS) {
             bw.write(TeamTournamentStatsDetails.header(outputFileFormat,tournamentName)+"\n");
         }
@@ -189,7 +202,7 @@ public class ParserForFtcMatches {
 
             // read in a match line and parse it
             if (readingMultipleEvents) {
-                if ((inputDataFormat == Format.Data.RESULTS_DETAILS_ALL) && (inputFileFormat == Format.File.CSV)) {
+                if ((inputDataFormat == Format.Data.RESULTS_ALL) && (inputFileFormat == Format.File.CSV)) {
                     if (headerRead) {
                         matchInCol = inLine.split(",");
                         // remove non-tournament matches and practice matches
@@ -211,10 +224,23 @@ public class ParserForFtcMatches {
                     } else {
                         headerRead = true; // ignore first line
                     }
-                } else {
+                } else if ((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.RESULTSTXT)  ) {
+                    matchInCol = inLine.split("[ \t]");
+                    match = ParserForMatchResults.parseMatch(inLine, br);
+                    if (match !=null) {
+                        goodMatch=true;
+                    }
+                } else if ((inputDataFormat == Format.Data.RESULTS_DETAILS) && (inputFileFormat == Format.File.DETAILSTXT)  ) {
+                    matchInCol = inLine.split("[ \t]");
+                    match = ParserForMatchResultsDetails.parseMatch(inLine, br);
+                    if (match !=null) {
+                        goodMatch=true;
+                    }
+                }
+                else {
                     printErrorMessageAndExit("ERROR: invalid input data and file format combination. C0");
                 }
-            } else if ((inputDataFormat == Format.Data.RESULTS_DETAILS_ALL) && (inputFileFormat == Format.File.TXT)) {
+            } else if ((inputDataFormat == Format.Data.RESULTS_ALL) && (inputFileFormat == Format.File.MATCHESTXT)) {
                 matchInCol = inLine.split("[|]");
 
                 switch (season) {
@@ -248,13 +274,30 @@ public class ParserForFtcMatches {
             }
 
             if (outputDataFormat == Format.Data.EVENT_NAMES) {
-                if ((matchInCol != null) && !matchInCol[1].equals(previousName)) {
-                    String outStr = "";
-                    for (int i = 0; i < 5; i++) {
-                        outStr += matchInCol[i] + "|";
+                if ((inputDataFormat == Format.Data.RESULTS_ALL) && (inputFileFormat == Format.File.CSV)) {
+                    if ((matchInCol != null) && !matchInCol[1].equals(previousName)) {
+                        String outStr = "";
+                        for (int i = 0; i < 5; i++) {
+                            outStr += matchInCol[i] + "|";
+                        }
+                        bw.write(outStr + "\n");
+                        previousName = matchInCol[1];
                     }
-                    bw.write(outStr + "\n");
-                    previousName = matchInCol[1];
+                }
+                if (((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.RESULTSTXT))||
+                        ((inputDataFormat == Format.Data.RESULTS_DETAILS) && (inputFileFormat == Format.File.DETAILSTXT))   ) {
+                    if ((matchInCol != null) & (matchInCol.length>0)) {
+                        if (matchInCol[0].equals("division:")) {
+                            String outStr = matchInCol[matchInCol.length - 1] + ","; // date
+                            for (int i = 1; i < matchInCol.length - 1; i++) {
+                                outStr += matchInCol[i];
+                                if (i != matchInCol.length - 2) {
+                                    outStr += " ";
+                                }
+                            }
+                            bw.write(outStr + "\n");
+                        }
+                    }
                 }
             }
         }
@@ -342,19 +385,20 @@ public class ParserForFtcMatches {
         helpString += "    -iA : convert from a MatchResultsAll file\n";
 
         helpString += "    -iC : input file in csv format\n";
-        helpString += "    -iT : input file in txt format (matches.txt)\n";
+        helpString += "    -iT : input file in matches.txt\n";
+        helpString += "    -iTR : input file in txt MR format\n";
+        helpString += "    -iTD : input file in txt MRD format\n";
 
         helpString += "    -iM : input file has multiple events\n";
 
 
         helpString += "    -oN : output event names\n";
 
-        helpString += "    -or : convert to a Rankings.html file\n";
+        helpString += "    -or : convert to a Rankings file\n";
         helpString += "    -oR : convert to a MatchResults file\n";
-        helpString += "    -R1 : output MatchResults 1 per line\n";
         helpString += "    -oD : convert to a MatchResultsDetails file\n";
 
-//        helpString += "    -oSR : convert to a StatsResults file\n";
+        helpString += "    -oSR : convert to a StatsResults file\n";
         helpString += "    -oSD : convert to a StatsDetails file\n";
 
         helpString += "    -oC : output files in csv format\n";
