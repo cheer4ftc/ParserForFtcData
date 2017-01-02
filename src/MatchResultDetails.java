@@ -16,11 +16,20 @@ public class MatchResultDetails extends MatchResult {
 	MatchResultDetails(MatchResult mr) {
 		super();
 
+		allianceDetails = new AllianceResultDetails[2];
+
 		allianceDetails[0]=new AllianceResultDetails(mr.alliance[0]);
 		alliance[0]=allianceDetails[0];
+		alliance[0].score = mr.alliance[0].score;
+		allianceDetails[0].setScore(AllianceResultDetails.ScoreType.TELE,mr.alliance[0].score);
 
 		allianceDetails[1]=new AllianceResultDetails(mr.alliance[1]);
 		alliance[1]=allianceDetails[1];
+		alliance[1].score = mr.alliance[1].score;
+		allianceDetails[1].setScore(AllianceResultDetails.ScoreType.TELE,mr.alliance[1].score);
+
+		this.copy(mr);
+
 	}
 
 	public static String header(Format.File outputFileFormat, String tournamentName) {

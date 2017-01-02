@@ -8,6 +8,13 @@ public class AllianceResult {
 			team[j]=new TeamMatchStatus();
 		}
 	}
+
+	public void copy(AllianceResult ari) {
+		score=ari.score;
+		team[0].copy(ari.team[0]);
+		team[1].copy(ari.team[1]);
+		team[2].copy(ari.team[2]);
+	}
 	
 	public int score() {
 		return score;

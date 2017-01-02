@@ -51,7 +51,7 @@ public class TeamTournamentStatsDetails extends TeamTournamentStatsResults {
 
     public String bodyLine(Format.File outputFileFormat, String tournamentCode) {
         String outS = "";
-        outS += super.bodyLine(outputFileFormat, tournamentCode);
+        outS += super.bodyLineStatResult(outputFileFormat, tournamentCode);
 
         if (outputFileFormat == Format.File.CSV) {
             for (int i = 1; i < AllianceResultDetails.ScoreType.values().length; i++) {

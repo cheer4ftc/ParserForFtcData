@@ -175,19 +175,19 @@ public class ParserForFtcMatches {
 
         // output any desired header
         if (outputDataFormat == Format.Data.RANKINGS) {
-            bw.write(TeamTournamentRanking.header(outputFileFormat,tournamentName)+"\n");
+            bw.write(TeamTournamentRanking.header(outputFileFormat, tournamentName) + "\n");
         }
         if (outputDataFormat == Format.Data.RESULTS_DETAILS) {
-            bw.write(MatchResultDetails.header(outputFileFormat, tournamentName)+"\n");
+            bw.write(MatchResultDetails.header(outputFileFormat, tournamentName) + "\n");
         }
         if (outputDataFormat == Format.Data.RESULTS) {
-            bw.write(MatchResult.header(outputFileFormat, tournamentName)+"\n");
+            bw.write(MatchResult.header(outputFileFormat, tournamentName) + "\n");
         }
         if (outputDataFormat == Format.Data.STATS_DETAILS) {
-            bw.write(TeamTournamentStatsDetails.header(outputFileFormat,tournamentName)+"\n");
+            bw.write(TeamTournamentStatsDetails.header(outputFileFormat, tournamentName) + "\n");
         }
         if (outputDataFormat == Format.Data.STATS_RESULTS) {
-            bw.write(TeamTournamentStatsResults.header(outputFileFormat,tournamentName)+"\n");
+            bw.write(TeamTournamentStatsResults.header(outputFileFormat, tournamentName) + "\n");
         }
 
         // parse matches
@@ -196,6 +196,7 @@ public class ParserForFtcMatches {
         String[] matchInCol = null;
         String previousName = "";
         boolean headerRead = false;
+        String currentTournament = "";
 
         while ((inLine = br.readLine()) != null) {
             boolean goodMatch = false;
@@ -224,20 +225,35 @@ public class ParserForFtcMatches {
                     } else {
                         headerRead = true; // ignore first line
                     }
-                } else if ((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.RESULTSTXT)  ) {
+                } else if (((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.RESULTSTXT)) ||
+                        ((inputDataFormat == Format.Data.RESULTS_DETAILS) && (inputFileFormat == Format.File.DETAILSTXT))) {
                     matchInCol = inLine.split("[ \t]");
-                    match = ParserForMatchResults.parseMatch(inLine, br);
-                    if (match !=null) {
-                        goodMatch=true;
+                    // search for tournament name and update if found
+                    if ((matchInCol != null) & (matchInCol.length > 0)) {
+                        if (matchInCol[0].equals("division:")) {
+                            currentTournament = "";
+                            for (int i = 1; i < matchInCol.length - 1; i++) {
+                                currentTournament += matchInCol[i];
+                                if (i != matchInCol.length - 2) {
+                                    currentTournament += " ";
+                                }
+                            }
+                        }
                     }
-                } else if ((inputDataFormat == Format.Data.RESULTS_DETAILS) && (inputFileFormat == Format.File.DETAILSTXT)  ) {
-                    matchInCol = inLine.split("[ \t]");
-                    match = ParserForMatchResultsDetails.parseMatch(inLine, br);
-                    if (match !=null) {
-                        goodMatch=true;
+
+                    if (currentTournament.equals(tournamentName)) {
+                        // start of new match? If so, parse
+                        if (inputDataFormat == Format.Data.RESULTS) {
+                            match = ParserForMatchResults.parseMatch(inLine, br);
+                        }
+                        if (inputDataFormat == Format.Data.RESULTS_DETAILS) {
+                            match = ParserForMatchResultsDetails.parseMatch(inLine, br);
+                        }
+                        if (match != null) {
+                            goodMatch = true;
+                        }
                     }
-                }
-                else {
+                } else {
                     printErrorMessageAndExit("ERROR: invalid input data and file format combination. C0");
                 }
             } else if ((inputDataFormat == Format.Data.RESULTS_ALL) && (inputFileFormat == Format.File.MATCHESTXT)) {
@@ -262,14 +278,27 @@ public class ParserForFtcMatches {
             // process/ output the match info
             if (outputDataFormat == Format.Data.RESULTS_DETAILS) {
                 if (goodMatch) {
-                    bw.write(MatchResultDetails.bodyLine((MatchResultDetails) match, outputFileFormat,season.code()+"-"+tournamentCode ));
+                    bw.write(MatchResultDetails.bodyLine((MatchResultDetails) match, outputFileFormat, season.code() + "-" + tournamentCode));
+                }
+            }
+
+            if (outputDataFormat == Format.Data.RESULTS) {
+                if (goodMatch) {
+                    bw.write(MatchResult.bodyLine(match, outputFileFormat, season.code() + "-" + tournamentCode));
                 }
             }
 
             if ((outputDataFormat == Format.Data.RANKINGS)
+                    || (outputDataFormat == Format.Data.STATS_RESULTS)
                     || (outputDataFormat == Format.Data.STATS_DETAILS)) {
                 if (goodMatch) {
-                    matchList.add((MatchResultDetails) match);
+                    if (match instanceof MatchResultDetails) {
+                        matchList.add((MatchResultDetails) match);
+                    }
+                    if (match instanceof MatchResult) {
+    //                    System.err.println("adding MatchResult:"+match.resultString());
+                        matchList.add(new MatchResultDetails(match));
+                    }
                 }
             }
 
@@ -284,9 +313,9 @@ public class ParserForFtcMatches {
                         previousName = matchInCol[1];
                     }
                 }
-                if (((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.RESULTSTXT))||
-                        ((inputDataFormat == Format.Data.RESULTS_DETAILS) && (inputFileFormat == Format.File.DETAILSTXT))   ) {
-                    if ((matchInCol != null) & (matchInCol.length>0)) {
+                if (((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.RESULTSTXT)) ||
+                        ((inputDataFormat == Format.Data.RESULTS_DETAILS) && (inputFileFormat == Format.File.DETAILSTXT))) {
+                    if ((matchInCol != null) & (matchInCol.length > 0)) {
                         if (matchInCol[0].equals("division:")) {
                             String outStr = matchInCol[matchInCol.length - 1] + ","; // date
                             for (int i = 1; i < matchInCol.length - 1; i++) {
@@ -304,7 +333,7 @@ public class ParserForFtcMatches {
 
 
         // output postprocessing and footers
-        if (outputDataFormat == Format.Data.RESULTS_DETAILS) {
+        if ((outputDataFormat == Format.Data.RESULTS_DETAILS) || (outputDataFormat == Format.Data.RESULTS)) {
             if (outputFileFormat == Format.File.HTML)
                 bw.write(HtmlFooter());
         }
@@ -322,7 +351,7 @@ public class ParserForFtcMatches {
 
             String outS = "";
             for (int t = 0; t < teamT.size(); t++) {
-                outS+=teamT.get(t).bodyLine(outputFileFormat,season.code()+"-"+tournamentCode)+"\n";
+                outS += teamT.get(t).bodyLine(outputFileFormat, season.code() + "-" + tournamentCode) + "\n";
             }
             if (outputFileFormat == Format.File.HTML) {
                 outS += HtmlFooter();
@@ -347,7 +376,11 @@ public class ParserForFtcMatches {
 
             String outS = "";
             for (int t = 0; t < teamT.size(); t++) {
-                outS+= teamT.get(t).bodyLine(outputFileFormat, season.code()+"-"+tournamentCode);
+                if (outputDataFormat== Format.Data.STATS_RESULTS) {
+                    outS += (teamT.get(t)).bodyLineStatResult(outputFileFormat, season.code() + "-" + tournamentCode);
+                } else {
+                    outS += (teamT.get(t)).bodyLine(outputFileFormat, season.code() + "-" + tournamentCode);
+                }
                 outS += "\n";
             }
             bw.write(outS);

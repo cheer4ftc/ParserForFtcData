@@ -22,6 +22,8 @@ public class TeamTournamentRanking extends TeamInfo implements Comparable<TeamTo
             int winner = 0;
             boolean tie = false;
 
+//            System.err.println("Updating Q match ranking");
+
             // update Q matches played
             rank[RankType.MATCHES_PLAYED.ordinal()]++;
 

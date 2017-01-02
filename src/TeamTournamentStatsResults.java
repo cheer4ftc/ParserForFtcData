@@ -31,7 +31,7 @@ public class TeamTournamentStatsResults extends TeamTournamentRanking {
         return TeamTournamentRanking.header(Format.File.CSV,tournamentName)+"WP,OPR,OPRm,";
     }
 
-    public String bodyLine(Format.File outputFileFormat, String tournamentCode) {
+    public String bodyLineStatResult(Format.File outputFileFormat, String tournamentCode) {
         String outS="";
         outS+=super.bodyLine(outputFileFormat,tournamentCode);
 

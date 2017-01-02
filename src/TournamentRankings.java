@@ -47,6 +47,7 @@ public class TournamentRankings {
                         }
                         if (!currMatch.alliance[j].team[k].surrogate)
                             teamRanking.get(l).updateRanking(currMatch, j);
+                        //System.err.println("reading MatchResult:"+currMatch.resultString());
                     }
                 }
             }
@@ -54,6 +55,7 @@ public class TournamentRankings {
         Collections.sort(teamRanking);
         for (int t = 0; t < teamRanking.size(); t++) {
             teamRanking.get(t).rank[RankType.RANK.ordinal()] = t + 1;
+     //       System.err.println("updating ranking:"+t+" "+teamRanking.get(t).number+" "+teamRanking.get(t).rank[RankType.RP.ordinal()]);
         }
     }
 
