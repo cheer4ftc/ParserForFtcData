@@ -7,7 +7,7 @@ public class Format {
     }
 
     public enum File {
-        MATCHESTXT, CSV, HTML, RESULTSTXT, DETAILSTXT
+        MATCHESTXT, CSV, HTML, RESULTSTXT, DETAILSTXT, FLORIDATXT
     }
 
     public enum Season {

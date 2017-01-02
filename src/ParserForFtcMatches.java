@@ -93,10 +93,16 @@ public class ParserForFtcMatches {
                     break;
                 case "-iT":
                     inputFileFormat = Format.File.MATCHESTXT;
+                    inputDataFormat = Format.Data.RESULTS_ALL;
                     clptr++;
                     break;
                 case "-iTR":
                     inputFileFormat = Format.File.RESULTSTXT;
+                    inputDataFormat = Format.Data.RESULTS;
+                    clptr++;
+                    break;
+                case "-iTF":
+                    inputFileFormat = Format.File.FLORIDATXT;
                     inputDataFormat = Format.Data.RESULTS;
                     clptr++;
                     break;
@@ -197,6 +203,7 @@ public class ParserForFtcMatches {
         String previousName = "";
         boolean headerRead = false;
         String currentTournament = "";
+        String lastTournament="";
 
         while ((inLine = br.readLine()) != null) {
             boolean goodMatch = false;
@@ -253,6 +260,38 @@ public class ParserForFtcMatches {
                             goodMatch = true;
                         }
                     }
+                } else if ((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.FLORIDATXT)) {
+                    matchInCol = inLine.split("[ \t]");
+                    currentTournament=lastTournament;
+
+                    // skip ranking lines
+                    boolean rankingLine = true;
+                    try {
+                        int testNum = Integer.valueOf(matchInCol[1]);
+                    } catch (Exception e) {
+                        rankingLine = false;
+                    }
+
+                    if (!rankingLine) {
+                        // grab tournament name from start of line
+                        if ((matchInCol != null) & (matchInCol.length > 0)) {
+
+                            currentTournament = matchInCol[0];
+                            for (int i = 1; i < matchInCol.length - 13; i++) {
+                                currentTournament += " " + matchInCol[i];
+                            }
+                        }
+                        //System.err.println(currentTournament);
+
+                        if (currentTournament.equals(tournamentName)) {
+                            // start of new match? If so, parse
+                            match = ParserForMatchResultsFlorida.parseMatch(Arrays
+                                    .copyOfRange(matchInCol, matchInCol.length - 13, matchInCol.length));
+                            if (match != null) {
+                                goodMatch = true;
+                            }
+                        }
+                    }
                 } else {
                     printErrorMessageAndExit("ERROR: invalid input data and file format combination. C0");
                 }
@@ -270,6 +309,7 @@ public class ParserForFtcMatches {
                         printErrorMessageAndExit("Error: unsupported season");
                 }
                 goodMatch = true;
+    //            System.err.println("good match");
             } else {
                 printErrorMessageAndExit("ERROR: invalid input data and file format combination. C1");
             }
@@ -294,9 +334,8 @@ public class ParserForFtcMatches {
                 if (goodMatch) {
                     if (match instanceof MatchResultDetails) {
                         matchList.add((MatchResultDetails) match);
-                    }
-                    if (match instanceof MatchResult) {
-    //                    System.err.println("adding MatchResult:"+match.resultString());
+                    } else if (match instanceof MatchResult) {
+                        //                    System.err.println("adding MatchResult:"+match.resultString());
                         matchList.add(new MatchResultDetails(match));
                     }
                 }
@@ -327,6 +366,12 @@ public class ParserForFtcMatches {
                             bw.write(outStr + "\n");
                         }
                     }
+                }
+                if ((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.FLORIDATXT)) {
+                    if (!currentTournament.equals(lastTournament)) {
+                        bw.write(currentTournament+"\n");
+                    }
+                    lastTournament=currentTournament;
                 }
             }
         }
@@ -376,7 +421,7 @@ public class ParserForFtcMatches {
 
             String outS = "";
             for (int t = 0; t < teamT.size(); t++) {
-                if (outputDataFormat== Format.Data.STATS_RESULTS) {
+                if (outputDataFormat == Format.Data.STATS_RESULTS) {
                     outS += (teamT.get(t)).bodyLineStatResult(outputFileFormat, season.code() + "-" + tournamentCode);
                 } else {
                     outS += (teamT.get(t)).bodyLine(outputFileFormat, season.code() + "-" + tournamentCode);
@@ -421,6 +466,7 @@ public class ParserForFtcMatches {
         helpString += "    -iT : input file in matches.txt\n";
         helpString += "    -iTR : input file in txt MR format\n";
         helpString += "    -iTD : input file in txt MRD format\n";
+        helpString += "    -iTF : input file in txt Florida format\n";
 
         helpString += "    -iM : input file has multiple events\n";
 
