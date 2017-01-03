@@ -5,7 +5,7 @@ public class ParserForMatchResultsDetails extends ParserForMatchResults {
 
 	public static MatchResultDetails parseMatch(String line, BufferedReader br) throws IOException {
 		MatchResultDetails match = new MatchResultDetails();
-		String[] matchInCol = line.split("[ \t]");
+		String[] matchInCol = line.split("[ \t]+");
 
 		if (matchInCol.length<2)
 			return null;

@@ -13,9 +13,18 @@ public class TeamMatchStatus extends TeamInfo {
     }
 
     public void setNumberAndSurrogate(String str) {
+        if (str.length()<1) {
+            surrogate = false;
+            number = 0;
+            return;
+        }
         if (str.substring(str.length() - 1, str.length()).equals("*")) {
             surrogate = true;
-            number = Integer.valueOf(str.substring(0, str.length() - 1));
+            try {
+                number = Integer.valueOf(str.substring(0, str.length() - 1));
+            } catch (Exception e) {
+                System.err.println("Surrogate error:"+str);
+            }
         } else {
             surrogate = false;
             number = Integer.valueOf(str);

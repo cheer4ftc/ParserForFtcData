@@ -203,7 +203,7 @@ public class ParserForFtcMatches {
         String previousName = "";
         boolean headerRead = false;
         String currentTournament = "";
-        String lastTournament="";
+        String lastTournament = "";
 
         while ((inLine = br.readLine()) != null) {
             boolean goodMatch = false;
@@ -262,7 +262,7 @@ public class ParserForFtcMatches {
                     }
                 } else if ((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.FLORIDATXT)) {
                     matchInCol = inLine.split("[ \t]");
-                    currentTournament=lastTournament;
+                    currentTournament = lastTournament;
 
                     // skip ranking lines
                     boolean rankingLine = true;
@@ -309,16 +309,21 @@ public class ParserForFtcMatches {
                         printErrorMessageAndExit("Error: unsupported season");
                 }
                 goodMatch = true;
-    //            System.err.println("good match");
+                //            System.err.println("good match");
             } else {
-                printErrorMessageAndExit("ERROR: invalid input data and file format combination. C1");
+                String s = "ERROR: invalid input data and file format combination. C1\n";
+                for (int i = 0; i < args.length; i++) {
+                    s += args[i] + " ";
+                }
+                s += "\n";
+                printErrorMessageAndExit(s);
             }
 
 
             // process/ output the match info
             if (outputDataFormat == Format.Data.RESULTS_DETAILS) {
                 if (goodMatch) {
-                    bw.write(MatchResultDetails.bodyLine((MatchResultDetails) match, outputFileFormat, season.code() + "-" + tournamentCode));
+                    bw.write(MatchResultDetails.bodyLine((MatchResultDetails)match, outputFileFormat, season.code() + "-" + tournamentCode));
                 }
             }
 
@@ -332,9 +337,9 @@ public class ParserForFtcMatches {
                     || (outputDataFormat == Format.Data.STATS_RESULTS)
                     || (outputDataFormat == Format.Data.STATS_DETAILS)) {
                 if (goodMatch) {
-                    if (match instanceof MatchResultDetails) {
+                    if ((inputDataFormat == Format.Data.RESULTS_DETAILS) || (inputDataFormat == Format.Data.RESULTS_ALL)) {
                         matchList.add((MatchResultDetails) match);
-                    } else if (match instanceof MatchResult) {
+                    } else if (inputDataFormat == Format.Data.RESULTS) {
                         //                    System.err.println("adding MatchResult:"+match.resultString());
                         matchList.add(new MatchResultDetails(match));
                     }
@@ -369,9 +374,9 @@ public class ParserForFtcMatches {
                 }
                 if ((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.FLORIDATXT)) {
                     if (!currentTournament.equals(lastTournament)) {
-                        bw.write(currentTournament+"\n");
+                        bw.write(currentTournament + "\n");
                     }
-                    lastTournament=currentTournament;
+                    lastTournament = currentTournament;
                 }
             }
         }
@@ -389,6 +394,7 @@ public class ParserForFtcMatches {
 
             List<MatchResult> matchResultList = new ArrayList<>();
             matchResultList.addAll(matchList);
+
             TournamentRankings.computeRankings(matchResultList, teamT);
 
             String fileOfTeams = season.code() + "-teams.csv";
