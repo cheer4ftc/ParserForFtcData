@@ -6,7 +6,7 @@ public class TeamInfo {
     String name;
 
     TeamInfo() {
-        number=-1;
+        number=0;
         name="";
     }
     public void copy(TeamInfo in) {
