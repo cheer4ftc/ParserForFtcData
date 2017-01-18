@@ -38,21 +38,36 @@ public class ParserForMatchResults {
 		match.alliance[0].score = Integer.valueOf(matchResult[0]);
 		match.alliance[1].score = Integer.valueOf(matchResult[1]);
 
+		if (matchInCol.length==5) { // two lines per match
+			match.alliance[0].team[0].setNumberAndSurrogate(matchInCol[3]);
+			match.alliance[1].team[0].setNumberAndSurrogate(matchInCol[4]);
 
-		match.alliance[0].team[0].setNumberAndSurrogate(matchInCol[3]);
-		match.alliance[1].team[0].setNumberAndSurrogate(matchInCol[4]);
+			String line2 = br.readLine();
+			matchInCol = line2.split("[ \t]");
+			match.alliance[0].team[1].setNumberAndSurrogate(matchInCol[0]);
+			match.alliance[1].team[1].setNumberAndSurrogate(matchInCol[1]);
 
-		String line2 = br.readLine();
-		matchInCol = line2.split("[ \t]");
-		match.alliance[0].team[1].setNumberAndSurrogate(matchInCol[0]);
-		match.alliance[1].team[1].setNumberAndSurrogate(matchInCol[1]);
+			if (match.type == 3 || match.type == 4) {
+				String line3 = br.readLine();
+				matchInCol = line3.split("[ \t]");
+				if (matchInCol.length == 2) {
+					match.alliance[0].team[2].number = Integer.valueOf(matchInCol[0]);
+					match.alliance[1].team[2].number = Integer.valueOf(matchInCol[1]);
+				}
+			}
+		} else { // one line per match
+			match.alliance[0].team[0].setNumberAndSurrogate(matchInCol[3]);
+			match.alliance[0].team[1].setNumberAndSurrogate(matchInCol[4]);
 
-		if (match.type==3 || match.type==4) {
-			String line3 = br.readLine();
-			matchInCol = line3.split("[ \t]");
-			if (matchInCol.length == 2) {
-				match.alliance[0].team[2].number = Integer.valueOf(matchInCol[0]);
-				match.alliance[1].team[2].number = Integer.valueOf(matchInCol[1]);
+			match.alliance[1].team[0].setNumberAndSurrogate(matchInCol[5]);
+			match.alliance[1].team[1].setNumberAndSurrogate(matchInCol[6]);
+
+			if (match.type == 3 || match.type == 4) { // 3 per alliance
+				match.alliance[0].team[2].number=match.alliance[1].team[0].number;
+				match.alliance[1].team[0].number=match.alliance[1].team[1].number;
+
+				match.alliance[1].team[1].number = Integer.valueOf(matchInCol[7]);
+				match.alliance[1].team[2].number = Integer.valueOf(matchInCol[8]);
 			}
 		}
 		return match;
