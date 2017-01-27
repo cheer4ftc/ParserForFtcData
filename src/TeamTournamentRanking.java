@@ -140,7 +140,7 @@ public class TeamTournamentRanking extends TeamInfo implements Comparable<TeamTo
                     + "<TR ALIGN=CENTER><TH>Rank</TH><TH>Team #</TH><TH>Team Name</TH><TH>QP</TH><TH>RP</TH><TH>Highest</TH><TH>Matches</TH></TR>";
         }
         if (outputFileFormat == Format.File.CSV) {
-            out = "TournamentCode,TeamNum,TeamName,R,QP,RP,High,MP,Elim,";
+            out = "TournamentCode,Num,TeamName,R,QP,RP,High,MP,Elim,";
         }
 
         return out;
