@@ -49,7 +49,7 @@ public class MatchResultDetails extends MatchResult {
 					+ "<TH >EndG</TH><TH >Pen</TH><TH >Tot</TH><TH >Auto</TH><TH >AutoB</TH><TH >Tele</TH><TH >EndG</TH><TH >Pen</TH></TR>\n";
 		}
 		if (outputFileFormat == Format.File.CSV) {
-			out = "TournamentMatchCode,Match,Result,Red0,Red1,Red2,Blue0,Blue1,Blue2,RTot,RAuto,RAutoB,RTele,REnd,RPen,BTot,BAuto,BAutoB,BTele,BEnd,BPen,";
+			out = "TournamentMatchCode,Match,Result,Red1,Red2,Red3,Blue1,Blue2,Blue3,RTot,RAuto,RAutoB,RTele,REnd,RPen,BTot,BAuto,BAutoB,BTele,BEnd,BPen,";
 		}
 		return out;
 	}

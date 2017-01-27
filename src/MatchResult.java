@@ -63,7 +63,7 @@ public class MatchResult {
                     "<TR ALIGN=CENTER><TH>Match</TH><TH>Result</TH><TH>Red</TH><TH>Blue</TH></TR>\n";
         }
         if (outputFileFormat == Format.File.CSV) {
-            out = "TournamentMatchCode,Match,Result,Red0,Red1,Red2,Blue0,Blue1,Blue2,RTot,BTot,";
+            out = "TournamentMatchCode,Match,Result,Red1,Red2,Red3,Blue1,Blue2,Blue3,RTot,BTot,";
         }
         return out;
     }
