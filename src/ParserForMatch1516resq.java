@@ -1,7 +1,8 @@
 public class ParserForMatch1516resq extends ParserForMatchesDotText {
 	public static MatchResult1516resq parseMatch(String[] col) {
 		MatchResult1516resq match = new MatchResult1516resq();
-		
+		match.rawString = col;
+
 		// common parsing here
 		parseTeams(col,match);
 		

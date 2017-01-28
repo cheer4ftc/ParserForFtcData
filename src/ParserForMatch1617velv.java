@@ -1,6 +1,7 @@
 public class ParserForMatch1617velv extends ParserForMatchesDotText {
 	public static MatchResult1617velv parseMatch(String[] col) {
 		MatchResult1617velv match = new MatchResult1617velv();
+		match.rawString = col;
 		
 		// common parsing here
 		parseTeams(col,match);

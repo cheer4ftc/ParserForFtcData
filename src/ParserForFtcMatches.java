@@ -130,6 +130,11 @@ public class ParserForFtcMatches {
                     outputDataFormat = Format.Data.RESULTS_DETAILS;
                     clptr++;
                     break;
+                case "-oW":
+                    outputDataFormat = Format.Data.RESULTS_RAW;
+                    outputFileFormat = Format.File.CSV;
+                    clptr++;
+                    break;
 
                 case "-oSR":
                     outputDataFormat = Format.Data.STATS_RESULTS;
@@ -189,6 +194,13 @@ public class ParserForFtcMatches {
         if (outputDataFormat == Format.Data.STATS_RESULTS) {
             bw.write(TeamTournamentStatsResults.header(outputFileFormat, tournamentName) + "\n");
         }
+        if (outputDataFormat == Format.Data.RESULTS_RAW) {
+            if (season==Format.Season.s1617VELV) {
+                bw.write(MatchResult1617velv.header(outputFileFormat, tournamentName) + "\n");
+            } else {
+                printErrorMessageAndExit("Error: Raw output format not supported for this season type!");
+            }
+        }
 
         // parse matches
         String inLine;
@@ -197,7 +209,6 @@ public class ParserForFtcMatches {
         String previousName = "";
         boolean headerRead = false;
         String currentTournament = "";
-        String lastTournament = "";
 
         while ((inLine = br.readLine()) != null) {
             boolean goodMatch = false;
@@ -283,12 +294,18 @@ public class ParserForFtcMatches {
 
 
             // process/ output the match info
+            if (outputDataFormat == Format.Data.RESULTS_RAW) {
+                if (goodMatch) {
+                    if (season== Format.Season.s1617VELV) {
+                        bw.write(MatchResult1617velv.bodyLine((MatchResult1617velv) match, outputFileFormat, season.code() + "-" + tournamentCode));
+                    }
+                }
+            }
             if (outputDataFormat == Format.Data.RESULTS_DETAILS) {
                 if (goodMatch) {
                     bw.write(MatchResultDetails.bodyLine((MatchResultDetails)match, outputFileFormat, season.code() + "-" + tournamentCode));
                 }
             }
-
             if (outputDataFormat == Format.Data.RESULTS) {
                 if (goodMatch) {
                     bw.write(MatchResult.bodyLine(match, outputFileFormat, season.code() + "-" + tournamentCode));
