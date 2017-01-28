@@ -21,8 +21,8 @@ public class MatchResult1617velv extends MatchResultDetails {
 			out = "TournamentMatchCode,Div,MType,MNum,Red1,Red2,Red3,Blue1,Blue2,Blue3," +
 					"R1DQ,R2DQ,R3DQ,R1YC,R2YC,R3YC,B1DQ,B2DQ,B3DQ,B1YC,B2YC,B3YC,R1Sur,R2Sur,R3Sur,B1Sur,B2Sur,B3Sur," +
 					"Saved," +
-					"RABeac,RACap,RACent,RACorn,RA0Pk,RA1Pk,BTBeac,BTCent,BTCorn,RECap,RPMin,RPMaj,RPMinRx,RPMajRx," +
-					"BABeac,BACap,BACent,BACorn,BA0Pk,BA1Pk,BTBeac,BTCent,BTCorn,BECap,BPMin,BPMaj,BPMinRx,BPMajRx,";		}
+					"RABeac,RACap,RACent,RACorn,RA1Pk,RA2Pk,RTBeac,RTCent,RTCorn,RECap,RPMin,RPMaj,RPMinRx,RPMajRx," +
+					"BABeac,BACap,BACent,BACorn,BA1Pk,BA2Pk,BTBeac,BTCent,BTCorn,BECap,BPMin,BPMaj,BPMinRx,BPMajRx,";		}
 		return out;
 	}
 
