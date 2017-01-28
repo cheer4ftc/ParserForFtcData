@@ -27,7 +27,7 @@ public class ParserForFtcMatches {
         season = Format.Season.s1617VELV;
 
         // default input is matches.txt file format
-        inputDataFormat = Format.Data.RESULTS_ALL;
+        inputDataFormat = Format.Data.RESULTS_RAW;
         inputFileFormat = Format.File.MATCHESTXT;
         String inputFileName = "";
 
@@ -83,7 +83,7 @@ public class ParserForFtcMatches {
                     break;
 
                 case "-iA":
-                    inputDataFormat = Format.Data.RESULTS_ALL;
+                    inputDataFormat = Format.Data.RESULTS_RAW;
                     clptr++;
                     break;
 
@@ -93,16 +93,11 @@ public class ParserForFtcMatches {
                     break;
                 case "-iT":
                     inputFileFormat = Format.File.MATCHESTXT;
-                    inputDataFormat = Format.Data.RESULTS_ALL;
+                    inputDataFormat = Format.Data.RESULTS_RAW;
                     clptr++;
                     break;
                 case "-iTR":
                     inputFileFormat = Format.File.RESULTSTXT;
-                    inputDataFormat = Format.Data.RESULTS;
-                    clptr++;
-                    break;
-                case "-iTF":
-                    inputFileFormat = Format.File.FLORIDATXT;
                     inputDataFormat = Format.Data.RESULTS;
                     clptr++;
                     break;
@@ -116,7 +111,6 @@ public class ParserForFtcMatches {
                     readingMultipleEvents = true;
                     clptr++;
                     break;
-
 
                 case "-oN":
                     outputDataFormat = Format.Data.EVENT_NAMES;
@@ -210,7 +204,7 @@ public class ParserForFtcMatches {
 
             // read in a match line and parse it
             if (readingMultipleEvents) {
-                if ((inputDataFormat == Format.Data.RESULTS_ALL) && (inputFileFormat == Format.File.CSV)) {
+                if ((inputDataFormat == Format.Data.RESULTS_RAW) && (inputFileFormat == Format.File.CSV)) {
                     if (headerRead) {
                         matchInCol = inLine.split(",");
                         // remove non-tournament matches and practice matches
@@ -260,42 +254,10 @@ public class ParserForFtcMatches {
                             goodMatch = true;
                         }
                     }
-                } else if ((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.FLORIDATXT)) {
-                    matchInCol = inLine.split("[ \t]");
-                    currentTournament = lastTournament;
-
-                    // skip ranking lines
-                    boolean rankingLine = true;
-                    try {
-                        int testNum = Integer.valueOf(matchInCol[1]);
-                    } catch (Exception e) {
-                        rankingLine = false;
-                    }
-
-                    if (!rankingLine) {
-                        // grab tournament name from start of line
-                        if ((matchInCol != null) & (matchInCol.length > 0)) {
-
-                            currentTournament = matchInCol[0];
-                            for (int i = 1; i < matchInCol.length - 13; i++) {
-                                currentTournament += " " + matchInCol[i];
-                            }
-                        }
-                        //System.err.println(currentTournament);
-
-                        if (currentTournament.equals(tournamentName)) {
-                            // start of new match? If so, parse
-                            match = ParserForMatchResultsFlorida.parseMatch(Arrays
-                                    .copyOfRange(matchInCol, matchInCol.length - 13, matchInCol.length));
-                            if (match != null) {
-                                goodMatch = true;
-                            }
-                        }
-                    }
                 } else {
                     printErrorMessageAndExit("ERROR: invalid input data and file format combination. C0");
                 }
-            } else if ((inputDataFormat == Format.Data.RESULTS_ALL) && (inputFileFormat == Format.File.MATCHESTXT)) {
+            } else if ((inputDataFormat == Format.Data.RESULTS_RAW) && (inputFileFormat == Format.File.MATCHESTXT)) {
                 matchInCol = inLine.split("[|]");
 
                 switch (season) {
@@ -337,7 +299,7 @@ public class ParserForFtcMatches {
                     || (outputDataFormat == Format.Data.STATS_RESULTS)
                     || (outputDataFormat == Format.Data.STATS_DETAILS)) {
                 if (goodMatch) {
-                    if ((inputDataFormat == Format.Data.RESULTS_DETAILS) || (inputDataFormat == Format.Data.RESULTS_ALL)) {
+                    if ((inputDataFormat == Format.Data.RESULTS_DETAILS) || (inputDataFormat == Format.Data.RESULTS_RAW)) {
                         matchList.add((MatchResultDetails) match);
                     } else if (inputDataFormat == Format.Data.RESULTS) {
                         //                    System.err.println("adding MatchResult:"+match.resultString());
@@ -347,7 +309,7 @@ public class ParserForFtcMatches {
             }
 
             if (outputDataFormat == Format.Data.EVENT_NAMES) {
-                if ((inputDataFormat == Format.Data.RESULTS_ALL) && (inputFileFormat == Format.File.CSV)) {
+                if ((inputDataFormat == Format.Data.RESULTS_RAW) && (inputFileFormat == Format.File.CSV)) {
                     if ((matchInCol != null) && !matchInCol[1].equals(previousName)) {
                         String outStr = "";
                         for (int i = 0; i < 5; i++) {
@@ -371,12 +333,6 @@ public class ParserForFtcMatches {
                             bw.write(outStr + "\n");
                         }
                     }
-                }
-                if ((inputDataFormat == Format.Data.RESULTS) && (inputFileFormat == Format.File.FLORIDATXT)) {
-                    if (!currentTournament.equals(lastTournament)) {
-                        bw.write(currentTournament + "\n");
-                    }
-                    lastTournament = currentTournament;
                 }
             }
         }
@@ -472,7 +428,6 @@ public class ParserForFtcMatches {
         helpString += "    -iT : input file in matches.txt\n";
         helpString += "    -iTR : input file in txt MR format\n";
         helpString += "    -iTD : input file in txt MRD format\n";
-        helpString += "    -iTF : input file in txt Florida format\n";
 
         helpString += "    -iM : input file has multiple events\n";
 
@@ -482,6 +437,7 @@ public class ParserForFtcMatches {
         helpString += "    -or : convert to a Rankings file\n";
         helpString += "    -oR : convert to a MatchResults file\n";
         helpString += "    -oD : convert to a MatchResultsDetails file\n";
+        helpString += "    -oW : convert to a MatchResultsRaw file\n";
 
         helpString += "    -oSR : convert to a StatsResults file\n";
         helpString += "    -oSD : convert to a StatsDetails file\n";
