@@ -70,7 +70,24 @@ public class TeamTournamentRanking extends TeamInfo implements Comparable<TeamTo
 
             // determine alliance result. keep overwriting. final match played gives final status!
             if (mr.type == 3) {
-                elim.allianceType = Elim.Result.SEMIFINALIST;
+                int winner = 0;
+                boolean tie = false;
+
+                if (mr.alliance[0].score() < mr.alliance[1].score()) {
+                    winner = 1;
+                } else if (mr.alliance[0].score() > mr.alliance[1].score()) {
+                    winner = 0;
+                } else {
+                    tie = true;
+                }
+
+                if (!tie) { // ignore ties
+                    if (all == winner) {
+                        elim.allianceType = Elim.Result.FINALIST;
+                    } else {
+                        elim.allianceType = Elim.Result.SEMIFINALIST;
+                    }
+                }
             } else {
                 int winner = 0;
                 boolean tie = false;
