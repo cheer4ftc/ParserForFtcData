@@ -49,7 +49,7 @@ public class MatchResultDetails extends MatchResult {
 					+ "<TH >EndG</TH><TH >Pen</TH><TH >Tot</TH><TH >Auto</TH><TH >AutoB</TH><TH >Tele</TH><TH >EndG</TH><TH >Pen</TH></TR>\n";
 		}
 		if (outputFileFormat == Format.File.CSV) {
-			out = "TournamentMatchCode,Match,Result,Red1,Red2,Red3,Blue1,Blue2,Blue3,RTot,RAuto,RAutoB,RTele,REnd,RPen,BTot,BAuto,BAutoB,BTele,BEnd,BPen,";
+			out = "TournamentMatchCode,Match,Result,Red1,Red2,Red3,Blue1,Blue2,Blue3,RTot,RAuto,RAutoB,RTele,REnd,RPen,BTot,BAuto,BAutoB,BTele,BEnd,BPen,R1Sur,R2Sur,B1Sur,B2Sur,";
 		}
 		return out;
 	}
@@ -98,6 +98,11 @@ public class MatchResultDetails extends MatchResult {
 				for (AllianceResultDetails.ScoreType t : AllianceResultDetails.ScoreType.values()) {
 					if ((t != AllianceResultDetails.ScoreType.TOTAL_WITH_NEGATIVE_PEN) && (t != AllianceResultDetails.ScoreType.PEN_INCURRED))
 						out += match.allianceDetails[i].score(t) + ",";
+				}
+			}
+			for (int i = 0; i < 2; i++) {
+				for (int j = 0; j < 2; j++) {
+					out += match.alliance[i].team[j].surrogate + ",";
 				}
 			}
 			out += "\n";

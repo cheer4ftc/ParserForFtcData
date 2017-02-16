@@ -63,7 +63,7 @@ public class MatchResult {
                     "<TR ALIGN=CENTER><TH>Match</TH><TH>Result</TH><TH>Red</TH><TH>Blue</TH></TR>\n";
         }
         if (outputFileFormat == Format.File.CSV) {
-            out = "TournamentMatchCode,Match,Result,Red1,Red2,Red3,Blue1,Blue2,Blue3,RTot,BTot,";
+            out = "TournamentMatchCode,Match,Result,Red1,Red2,Red3,Blue1,Blue2,Blue3,RTot,BTot,R1Sur,R2Sur,B1Sur,B2Sur,";
         }
         return out;
     }
@@ -107,6 +107,11 @@ public class MatchResult {
             }
             for (int i = 0; i < 2; i++) {
                 out += match.alliance[i].score() + ",";
+            }
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 2; j++) {
+                    out += match.alliance[i].team[j].surrogate + ",";
+                }
             }
             out += "\n";
         }
